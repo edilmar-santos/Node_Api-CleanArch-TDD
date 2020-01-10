@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --silent --passWithNoTests",
-    "test:unit": "npm test -- --watchAll -c jest-unit-config.js",
+    "test": "jest --passWithNoTests",
+    "test:unit": "npm test -- --coverage --watchAll -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
     "test:staged": "npm test -- --findRelatedTests",
-    "test:ci": "npm test -- --coverage --noStackTrace"
+    "test:ci": "npm test -- --silent --coverage --noStackTrace"
   },
   "standard": {
     "env": [
@@ -25,6 +25,8 @@
     "standard": "^14.3.1"
   },
   "dependencies": {
+    "bcrypt": "^3.0.7",
+    "jsonwebtoken": "^8.5.1",
     "validator": "^12.1.0"
   }
 }
