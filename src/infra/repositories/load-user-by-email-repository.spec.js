@@ -1,24 +1,23 @@
-const { MongoClient } = require('mongodb')
+const MongoHelper = require('../helpers/mongo-helper')
+const LoadUserByEmailRepository = require('./load-user-by-email-repository')
+const MissingParamError = require('./../../utils/errors/missing-param-error')
 
-class LoadUserByEmailRepository {
-  constructor (userModel) {
-    this.userModel = userModel
-  }
+let db
 
-  async load (email) {
-    return this.userModel.findOne({ email })
+const makeSut = () => {
+  const userModel = db.collection('users')
+  const sut = new LoadUserByEmailRepository(userModel)
+
+  return {
+    userModel,
+    sut
   }
 }
 
 describe('Load User By Email Repository', () => {
-  let connection, db
-
   beforeAll(async () => {
-    connection = await MongoClient.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    })
-    db = await connection.db()
+    await MongoHelper.connect(process.env.MONGO_URL)
+    db = await MongoHelper.getDb()
   })
 
   beforeEach(async () => {
@@ -26,26 +25,43 @@ describe('Load User By Email Repository', () => {
   })
 
   afterAll(async () => {
-    await connection.close()
+    await MongoHelper.closeConnection()
   })
 
   test('Should return null when user not found', async () => {
-    const userModel = db.collection('users')
-    const sut = new LoadUserByEmailRepository(userModel)
+    const { sut } = makeSut()
     const user = await sut.load('invalid_email@mail.com')
 
     expect(user).toBeNull()
   })
 
   test('Should return user when find valid email', async () => {
-    const userModel = db.collection('users')
-    await userModel.insertOne({
-      email: 'valid_email@mail.com'
+    const { sut, userModel } = makeSut()
+
+    const fakeUser = await userModel.insertOne({
+      email: 'valid_email@mail.com',
+      password: 'hashed_password',
+      name: 'test'
     })
 
-    const sut = new LoadUserByEmailRepository(userModel)
     const user = await sut.load('valid_email@mail.com')
+    expect(user).toEqual({
+      _id: fakeUser.ops[0]._id,
+      password: fakeUser.ops[0].password
+    })
+  })
 
-    expect(user.email).toBe('valid_email@mail.com')
+  test('Should throw an Execption when not injected an userModel', async () => {
+    const sut = new LoadUserByEmailRepository()
+    const promise = sut.load('any_email@mail.com')
+
+    expect(promise).rejects.toThrow()
+  })
+
+  test('Should throw an Execption when not injected an userModel', async () => {
+    const { sut } = makeSut()
+    const promise = sut.load()
+
+    expect(promise).rejects.toThrow(new MissingParamError('email'))
   })
 })
