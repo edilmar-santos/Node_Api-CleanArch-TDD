@@ -51,14 +51,14 @@ describe('Load User By Email Repository', () => {
     })
   })
 
-  test('Should throw an Execption when not injected an userModel', async () => {
+  test('Should throw an Execption when userModel not injected', async () => {
     const sut = new LoadUserByEmailRepository()
     const promise = sut.load('any_email@mail.com')
 
     expect(promise).rejects.toThrow()
   })
 
-  test('Should throw an Execption when not injected an userModel', async () => {
+  test('Should throw an Execption when email not provided', async () => {
     const { sut } = makeSut()
     const promise = sut.load()
 
