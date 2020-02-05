@@ -3,6 +3,9 @@
 
 module.exports = {
   coverageDirectory: 'coverage',
-  collectCoverageFrom: ['**/src/**/*.js'],
-  preset: '@shelf/jest-mongodb'
+  collectCoverageFrom: ['**/src/**/*.js', '!**/src/main/**.js'],
+  preset: '@shelf/jest-mongodb',
+  watchPathIgnorePatterns: [
+    '<rootDir>/node_modules'
+  ]
 }
