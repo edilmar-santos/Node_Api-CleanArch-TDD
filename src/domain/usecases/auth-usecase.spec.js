@@ -1,5 +1,4 @@
 const { MissingParamError } = require('../../utils/errors')
-
 const AuthUseCase = require('./auth-usecase')
 
 const makeLoadUserByEmailRepositorySpy = () => {

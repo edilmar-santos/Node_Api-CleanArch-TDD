@@ -9,11 +9,11 @@ describe('Mongo helper', () => {
     await sut.closeConnection()
   })
 
-  test('should connect when call getDb() and there is no connection', async () => {
+  test('should connect when call getCollection() and there is no connection', async () => {
     expect(sut.db).toBeTruthy()
     await sut.closeConnection()
     expect(sut.db).toBeFalsy()
-    const db = await sut.getDb()
+    const db = await sut.getCollection('users')
     expect(db).toBeTruthy()
     await sut.closeConnection()
   })
