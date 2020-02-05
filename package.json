@@ -2,11 +2,12 @@
   "name": "CleanArch-TDD",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/main/index.js",
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "start": "node src/main/index.js",
+    "test": "jest --passWithNoTests --runInBand",
     "test:unit": "npm test -- --watchAll -c jest-unit-config.js",
-    "test:integration": "npm test -- --watch -c jest-integration-config.js",
+    "test:integration": "npm test -- --watchAll -c jest-integration-config.js",
     "test:staged": "npm test -- --findRelatedTests",
     "test:ci": "npm test -- --silent --coverage --noStackTrace"
   },
@@ -23,10 +24,13 @@
     "husky": "^4.0.0-beta.5",
     "jest": "^24.9.0",
     "lint-staged": "^9.5.0",
-    "standard": "^14.3.1"
+    "standard": "^14.3.1",
+    "supertest": "^4.0.2"
   },
   "dependencies": {
     "bcrypt": "^3.0.7",
+    "express": "^4.17.1",
+    "fast-glob": "^3.1.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.2",
     "validator": "^12.1.0"
