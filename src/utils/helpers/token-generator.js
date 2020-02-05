@@ -7,15 +7,12 @@ module.exports = class TokenGenerator {
   }
 
   async generate (id) {
-    if (!id) {
-      throw new MissingParamError('id')
-    }
-
     if (!this.secret) {
       throw new MissingParamError('secret')
     }
-
-    const token = await jwt.sign(id, this.secret)
-    return token
+    if (!id) {
+      throw new MissingParamError('id')
+    }
+    return jwt.sign({ _id: id }, this.secret)
   }
 }

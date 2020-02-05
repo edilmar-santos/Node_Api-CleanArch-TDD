@@ -1,11 +1,13 @@
 const request = require('supertest')
 const app = require('../config/app')
 
-describe('Cors', () => {
+describe('CORS Middleware', () => {
   test('Should enable CORS', async () => {
-    app.get('/cors', (req, res) => res.send(''))
+    app.get('/test_cors', (req, res) => {
+      res.send('')
+    })
 
-    const res = await request(app).get('/cors')
+    const res = await request(app).get('/test_cors')
     expect(res.headers['access-control-allow-origin']).toBe('*')
     expect(res.headers['access-control-allow-methods']).toBe('*')
     expect(res.headers['access-control-allow-headers']).toBe('*')

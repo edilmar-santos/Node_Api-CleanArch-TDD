@@ -1,20 +1,19 @@
 const sut = require('./mongo-helper')
 
-describe('Mongo helper', () => {
+describe('Mongo Helper', () => {
   beforeAll(async () => {
     await sut.connect(process.env.MONGO_URL)
   })
 
   afterAll(async () => {
-    await sut.closeConnection()
+    await sut.disconnect()
   })
 
-  test('should connect when call getCollection() and there is no connection', async () => {
+  test('Should reconnect when getCollection() is invoked and client is disconnected', async () => {
     expect(sut.db).toBeTruthy()
-    await sut.closeConnection()
+    await sut.disconnect()
     expect(sut.db).toBeFalsy()
-    const db = await sut.getCollection('users')
-    expect(db).toBeTruthy()
-    await sut.closeConnection()
+    await sut.getCollection('users')
+    expect(sut.db).toBeTruthy()
   })
 })

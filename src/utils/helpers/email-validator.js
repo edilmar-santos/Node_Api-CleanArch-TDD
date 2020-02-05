@@ -6,7 +6,6 @@ module.exports = class EmailValidator {
     if (!email) {
       throw new MissingParamError('email')
     }
-
     return validator.isEmail(email)
   }
 }

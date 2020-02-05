@@ -1,37 +1,42 @@
-const EmailValidator = require('./email-validator')
+jest.mock('validator', () => ({
+  isEmailValid: true,
+
+  isEmail (email) {
+    this.email = email
+    return this.isEmailValid
+  }
+}))
+
 const validator = require('validator')
 const MissingParamError = require('../errors/missing-param-error')
+const EmailValidator = require('./email-validator')
 
 const makeSut = () => {
   return new EmailValidator()
 }
 
 describe('Email Validator', () => {
-  test('should return true when provided a valid email', () => {
+  test('Should return true if validator returns true', () => {
     const sut = makeSut()
-
-    const isValidValid = sut.isValid('valid_email@email.com')
-    expect(isValidValid).toBe(true)
+    const isEmailValid = sut.isValid('valid_email@mail.com')
+    expect(isEmailValid).toBe(true)
   })
 
-  test('should throws MissinParamError when email not provided', () => {
+  test('Should return false if validator returns false', () => {
+    validator.isEmailValid = false
     const sut = makeSut()
-
-    expect(sut.isValid).toThrow(new MissingParamError('email'))
+    const isEmailValid = sut.isValid('invalid_email@mail.com')
+    expect(isEmailValid).toBe(false)
   })
 
-  test('should return false when provided a invalid email', () => {
+  test('Should call validator with correct email', () => {
     const sut = makeSut()
-    validator.isValidEmail = false
-
-    const isValidValid = sut.isValid('invalid_email@email.com')
-    expect(isValidValid).toBe(false)
+    sut.isValid('any_email@mail.com')
+    expect(validator.email).toBe('any_email@mail.com')
   })
 
-  test('should call validator with the correct email', () => {
+  test('Should throw if no email is provided', async () => {
     const sut = makeSut()
-    sut.isValid('any_email@email.com')
-
-    expect(validator.email).toBe('any_email@email.com')
+    expect(() => { sut.isValid() }).toThrow(new MissingParamError('email'))
   })
 })

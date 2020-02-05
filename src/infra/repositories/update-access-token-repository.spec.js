@@ -1,14 +1,13 @@
 const MongoHelper = require('../helpers/mongo-helper')
-const MissingParamError = require('./../../utils/errors/missing-param-error')
+const MissingParamError = require('../../utils/errors/missing-param-error')
 const UpdateAccessTokenRepository = require('./update-access-token-repository')
-
 let userModel, fakeUserId
 
 const makeSut = () => {
-  return new UpdateAccessTokenRepository(userModel)
+  return new UpdateAccessTokenRepository()
 }
 
-describe('Update Access Token', () => {
+describe('UpdateAccessToken Repository', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
     userModel = await MongoHelper.getCollection('users')
@@ -18,27 +17,27 @@ describe('Update Access Token', () => {
     await userModel.deleteMany()
     const fakeUser = await userModel.insertOne({
       email: 'valid_email@mail.com',
-      password: 'hashed_password',
-      name: 'test'
+      name: 'any_name',
+      age: 50,
+      state: 'any_state',
+      password: 'hashed_password'
     })
-
     fakeUserId = fakeUser.ops[0]._id
   })
 
   afterAll(async () => {
-    await MongoHelper.closeConnection()
+    await MongoHelper.disconnect()
   })
 
-  test('Should update the user with the provided accessToken', async () => {
+  test('Should update the user with the given accessToken', async () => {
     const sut = makeSut()
     await sut.update(fakeUserId, 'valid_token')
-    const userUpdated = await userModel.findOne({ _id: fakeUserId })
-    expect(userUpdated.accessToken).toBe('valid_token')
+    const updatedFakeUser = await userModel.findOne({ _id: fakeUserId })
+    expect(updatedFakeUser.accessToken).toBe('valid_token')
   })
 
-  test('Should throw an Execption when parameters not provided', async () => {
+  test('Should throw if no params are provided', async () => {
     const sut = makeSut()
-
     expect(sut.update()).rejects.toThrow(new MissingParamError('userId'))
     expect(sut.update(fakeUserId)).rejects.toThrow(new MissingParamError('accessToken'))
   })

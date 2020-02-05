@@ -1,9 +1,10 @@
 const request = require('supertest')
-const MongoHelper = require('../../infra/helpers/mongo-helper')
 const app = require('../config/app')
-
+const bcrypt = require('bcrypt')
+const MongoHelper = require('../../infra/helpers/mongo-helper')
 let userModel
-describe('Login Route', () => {
+
+describe('Login Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
     userModel = await MongoHelper.getCollection('users')
@@ -14,13 +15,13 @@ describe('Login Route', () => {
   })
 
   afterAll(async () => {
-    await MongoHelper.closeConnection()
+    await MongoHelper.disconnect()
   })
 
-  test('Should return code 200 when provided valid params', async () => {
+  test('Should return 200 when valid credentials are provided', async () => {
     await userModel.insertOne({
       email: 'valid_email@mail.com',
-      password: 'hashed_password'
+      password: bcrypt.hashSync('hashed_password', 10)
     })
 
     await request(app)
@@ -30,5 +31,15 @@ describe('Login Route', () => {
         password: 'hashed_password'
       })
       .expect(200)
+  })
+
+  test('Should return 401 when invalid credentials are provided', async () => {
+    await request(app)
+      .post('/api/login')
+      .send({
+        email: 'valid_email@mail.com',
+        password: 'hashed_password'
+      })
+      .expect(401)
   })
 })
