@@ -9,7 +9,11 @@ const makeSut = () => {
 
   authUseCaseSpy.accessToken = 'any_token'
   emailValidatorSpy.isValidEmail = true
-  const sut = new LoginRouter(authUseCaseSpy, emailValidatorSpy)
+  const sut = new LoginRouter({
+    authUseCase: authUseCaseSpy,
+    emailValidator: emailValidatorSpy
+  })
+
   return {
     sut,
     authUseCaseSpy,
